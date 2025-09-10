@@ -1,0 +1,43 @@
+#version 330 core
+
+layout (triangles) in;
+layout (triangle_strip) out;
+layout (max_vertices = 3) out;
+
+in vec4 v2f_colorv[];
+in vec4 world_posv[];
+//in vec3 world_normalv[];
+uniform vec4 EyePosW; 
+
+
+out vec4 v2f_color;
+out vec4 v2f_normalW;
+//out vec3 normal;
+//out vec3 world_pos;
+out vec4 v2f_positionW;
+
+
+void main(void)
+{
+    int i;
+	vec3 ab = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+	vec3 ac = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+	vec3 xxx = normalize(cross(ab, ac));
+
+	bool yyy;
+
+	vec3 toeye = vec3(EyePosW)- gl_in[0].gl_Position.xyz ;
+
+	yyy = (dot(toeye,xxx) < 0);
+
+	if (yyy) xxx = xxx*-1;
+	v2f_normalW = vec4(xxx,1);
+    for (i = 0; i < gl_in.length(); i++)
+    {	
+        v2f_color = v2f_colorv[i];
+		v2f_positionW = world_posv[i];
+		gl_Position = gl_in[i].gl_Position;
+        EmitVertex();
+    }
+    EndPrimitive();
+}
